@@ -1,0 +1,254 @@
+[gd_scene load_steps=4 format=3 uid="uid://7u7l6evisnec"]
+
+[ext_resource type="Script" uid="uid://vooqryllo1p4" path="res://scripts/ui/hud_controller.gd" id="1"]
+[ext_resource type="Script" uid="uid://dalg30jfifpht" path="res://scripts/ui/graph_renderer.gd" id="2"]
+[ext_resource type="Script" uid="uid://dqf2n0tynjh4n" path="res://scripts/ui/control_panel.gd" id="3"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="TopPanel" type="PanelContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 50.0
+grow_horizontal = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="TopPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Stats" type="HBoxContainer" parent="TopPanel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="SexualCount" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/Stats"]
+layout_mode = 2
+text = "Sexual: 0"
+
+[node name="AsexualCount" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/Stats"]
+layout_mode = 2
+text = "Asexual: 0"
+
+[node name="TotalCount" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/Stats"]
+layout_mode = 2
+text = "Total: 0"
+
+[node name="Generation" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/Stats"]
+layout_mode = 2
+text = "Avg Generation: 0.0"
+
+[node name="Controls" type="HBoxContainer" parent="TopPanel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PlayButton" type="Button" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+text = "Play"
+
+[node name="PauseButton" type="Button" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+disabled = true
+text = "Pause"
+
+[node name="ResetButton" type="Button" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+text = "Reset"
+
+[node name="SpeedLabel" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+text = "Speed:"
+
+[node name="SpeedSlider" type="HSlider" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+min_value = 0.1
+max_value = 5.0
+step = 0.1
+value = 1.0
+
+[node name="SpeedValue" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+text = "1.0x"
+
+[node name="RightPanel" type="PanelContainer" parent="."]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -289.0
+offset_top = 54.000004
+offset_right = 31.0
+offset_bottom = 64.0
+grow_horizontal = 0
+grow_vertical = 2
+scale = Vector2(0.9, 0.9)
+
+[node name="MarginContainer" type="MarginContainer" parent="RightPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Node2D" type="Node2D" parent="RightPanel/MarginContainer"]
+position = Vector2(15, 608)
+rotation = -1.5707964
+
+[node name="ControlPanelLabel" type="Label" parent="RightPanel/MarginContainer/Node2D"]
+offset_right = 170.0
+offset_bottom = 23.0
+text = "Environment Controls"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RightPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GraphLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Population Over Time"
+horizontal_alignment = 1
+
+[node name="GraphRenderer" type="Control" parent="RightPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "        "
+
+[node name="ControlPanel" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+script = ExtResource("3")
+
+[node name="ScenarioSelector" type="HBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ScenarioSelector"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Scenario:"
+
+[node name="OptionButton" type="OptionButton" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ScenarioSelector"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HSeparator1" type="HSeparator" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="TempAmplitude" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempAmplitude"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempAmplitude/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Temp Amplitude"
+
+[node name="Value" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempAmplitude/HBox"]
+layout_mode = 2
+text = "20.0"
+
+[node name="Slider" type="HSlider" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempAmplitude"]
+layout_mode = 2
+min_value = 5.0
+max_value = 50.0
+value = 20.0
+
+[node name="TempFrequency" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempFrequency"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempFrequency/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Temp Frequency"
+
+[node name="Value" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempFrequency/HBox"]
+layout_mode = 2
+text = "0.1"
+
+[node name="Slider" type="HSlider" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempFrequency"]
+layout_mode = 2
+min_value = 0.05
+max_value = 1.0
+step = 0.05
+value = 0.1
+
+[node name="PathogenFreq" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/PathogenFreq"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/PathogenFreq/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Pathogen Frequency"
+
+[node name="Value" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/PathogenFreq/HBox"]
+layout_mode = 2
+text = "0.3"
+
+[node name="Slider" type="HSlider" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/PathogenFreq"]
+layout_mode = 2
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 0.30000000000000004
+
+[node name="ResourceLevel" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ResourceLevel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ResourceLevel/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Resource Abundance"
+
+[node name="Value" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ResourceLevel/HBox"]
+layout_mode = 2
+text = "100.0"
+
+[node name="Slider" type="HSlider" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ResourceLevel"]
+layout_mode = 2
+min_value = 20.0
+step = 5.0
+value = 100.0
+
+[node name="HSeparator2" type="HSeparator" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="ExportButton" type="Button" parent="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+text = "Export Statistics to CSV"
+
+[connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/PlayButton" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/PauseButton" to="." method="_on_pause_pressed"]
+[connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/ResetButton" to="." method="_on_reset_pressed"]
+[connection signal="value_changed" from="TopPanel/MarginContainer/HBoxContainer/Controls/SpeedSlider" to="." method="_on_speed_changed"]
+[connection signal="item_selected" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ScenarioSelector/OptionButton" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_scenario_selected"]
+[connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempAmplitude/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_temp_amplitude_changed"]
+[connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempFrequency/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_temp_frequency_changed"]
+[connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/PathogenFreq/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_pathogen_freq_changed"]
+[connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ResourceLevel/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_resource_changed"]
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ExportButton" to="." method="_on_export_pressed"]

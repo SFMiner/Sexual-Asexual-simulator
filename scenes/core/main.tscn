@@ -1,0 +1,77 @@
+[gd_scene load_steps=7 format=3 uid="uid://c5p6vc5p30yl0"]
+
+[ext_resource type="Script" uid="uid://c5ofuugn61yct" path="res://scripts/managers/population_manager.gd" id="1"]
+[ext_resource type="Script" uid="uid://3ql35me6ur6t" path="res://scripts/managers/environment_manager.gd" id="2"]
+[ext_resource type="Script" uid="uid://6nb2rg2tm6jq" path="res://scripts/managers/statistics_collector.gd" id="3"]
+[ext_resource type="Script" uid="uid://ccponkyvrm4pp" path="res://scripts/managers/visual_manager.gd" id="4"]
+[ext_resource type="PackedScene" uid="uid://7u7l6evisnec" path="res://scenes/ui/hud.tscn" id="5"]
+
+[sub_resource type="GDScript" id="init_script"]
+script/source = "extends Node
+
+func _ready():
+	var sim_manager = get_node('/root/SimulationManager')
+	var main = get_parent()
+	
+	sim_manager.population_manager = main.get_node('Managers/PopulationManager')
+	sim_manager.environment_manager = main.get_node('Managers/EnvironmentManager')
+	sim_manager.statistics_collector = main.get_node('Managers/StatisticsCollector')
+	sim_manager.visual_manager = main.get_node('SimulationView/SubViewport/SimulationSpace/VisualManager')
+	
+	var hud = main.get_node('HUD')
+	hud.sim_manager = sim_manager
+	
+	sim_manager.reset_simulation()
+"
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.05, 1)
+
+[node name="SimulationView" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="SimulationView"]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="SimulationSpace" type="Node2D" parent="SimulationView/SubViewport"]
+
+[node name="VisualManager" type="Node2D" parent="SimulationView/SubViewport/SimulationSpace"]
+script = ExtResource("4")
+
+[node name="Managers" type="Node" parent="."]
+
+[node name="PopulationManager" type="Node" parent="Managers"]
+script = ExtResource("1")
+
+[node name="EnvironmentManager" type="Node" parent="Managers"]
+script = ExtResource("2")
+
+[node name="StatisticsCollector" type="Node" parent="Managers"]
+script = ExtResource("3")
+
+[node name="HUD" parent="." instance=ExtResource("5")]
+
+[node name="InitScript" type="Node" parent="."]
+script = SubResource("init_script")
