@@ -38,17 +38,11 @@ func _process(delta: float):
 	# Update visuals every frame
 	visual_manager.update_visuals(population_manager)
 	
-	# Collect statistics less frequently
-	if frame_count % 10 == 0:  # Every 10 frames
-		statistics_collector.collect_sample(
-			population_manager.get_population_stats(),
-			environment_manager.get_conditions()
-		)
-	
-	# Emit population counts for UI
-	if frame_count % 30 == 0:  # Twice per second at 60fps
-		var stats = population_manager.get_population_counts()
-		population_update.emit(stats.sexual, stats.asexual)
+	# Collect statistics and emit updates every 30 frames
+	if frame_count % 30 == 0:
+		var stats = population_manager.get_population_stats()
+		statistics_collector.collect_sample(stats, environment_manager.get_conditions())
+		population_update.emit(stats.sexual_count, stats.asexual_count)
 
 func start_simulation():
 	is_running = true

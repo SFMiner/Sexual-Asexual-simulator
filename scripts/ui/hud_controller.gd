@@ -7,7 +7,7 @@ extends CanvasLayer
 @onready var generation_label = $TopPanel/MarginContainer/HBoxContainer/Stats/Generation
 
 @onready var graph_renderer = $RightPanel/MarginContainer/VBoxContainer/GraphRenderer
-@onready var control_panel = $RightPanel/MarginContainer/VBoxContainer/ControlPanel
+@onready var control_panel = $RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel
 
 @onready var play_button = $TopPanel/MarginContainer/HBoxContainer/Controls/PlayButton
 @onready var pause_button = $TopPanel/MarginContainer/HBoxContainer/Controls/PauseButton
@@ -46,20 +46,26 @@ func _on_population_update(sexual: int, asexual: int):
 	asexual_label.text = "Asexual: %d" % asexual
 	total_label.text = "Total: %d" % (sexual + asexual)
 	
+	# Update average generation from current stats
+	if sim_manager.statistics_collector.current_stats.has("avg_generation"):
+		generation_label.text = "Avg Generation: %.1f" % sim_manager.statistics_collector.current_stats.avg_generation
+	
 	graph_renderer.add_data_point(sexual, asexual)
 
 func _on_state_changed(is_running: bool):
 	play_button.disabled = is_running
 	pause_button.disabled = not is_running
 
-func update_statistics(stats: Dictionary):
-	if stats.has("avg_generation"):
-		generation_label.text = "Avg Generation: %.1f" % stats.avg_generation
-
 func _on_export_pressed():
 	var timestamp = Time.get_datetime_string_from_system().replace(":", "-")
-	var filename = "user://simulation_data_%s.csv" % timestamp
-	sim_manager.statistics_collector.export_to_csv(filename)
 	
-	print("Statistics exported to: " + filename)
-	print("Full path: " + ProjectSettings.globalize_path(filename))
+	# Export all formats
+	DataExporter.export_all(
+		sim_manager.population_manager,
+		sim_manager.environment_manager,
+		sim_manager.statistics_collector,
+		"simulation_data"
+	)
+	
+	print("All data exported successfully!")
+	print("Files saved to: " + ProjectSettings.globalize_path("user://"))

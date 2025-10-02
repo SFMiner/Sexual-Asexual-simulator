@@ -6,7 +6,6 @@ extends Node
 var organisms: Array[OrganismData] = []
 var object_pool: ObjectPool
 var spatial_hash: SpatialHash
-@onready var main_scene = get_tree().current_scene
 
 var max_population: int = 2000
 var carrying_capacity: int = 2000
@@ -15,36 +14,53 @@ var carrying_capacity: int = 2000
 var update_batch_size: int = 100
 var current_batch_offset: int = 0
 
+var movement_tracker = {"total_x": 0.0, "total_y": 0.0, "count": 0, "frame": 0}
+
+# Boundaries for wrapping - MUST be set externally
+var world_bounds: Rect2 = Rect2(0, 0, 1152, 648)
+
 func _ready():
 	object_pool = ObjectPool.new(OrganismData, 2000)
 	spatial_hash = SpatialHash.new(50.0)  # 50 pixel cell size
 
+func set_world_bounds(bounds: Rect2):
+	world_bounds = bounds
+	print("PopulationManager world_bounds set to: ", world_bounds)
+
 func spawn_initial_population(sexual_count: int, asexual_count: int):
-	var spawn_area = main_scene.get_viewport_rect().size
+	print("Spawning in bounds: ", world_bounds)
+	
+	var spawn_area = world_bounds.size
 	
 	# Spawn sexual organisms
 	for i in sexual_count:
 		var org = OrganismData.new(true)
-		org.position = Vector2(
-			randf_range(50, spawn_area.x - 50),
-			randf_range(50, spawn_area.y - 50)
-		)
+		org.position = rand_position_organism()
 		org.energy = 100.0
 		org.is_alive = true
+		org.id = organisms.size()
 		organisms.append(org)
 		spatial_hash.insert(org)
 	
 	# Spawn asexual organisms
 	for i in asexual_count:
 		var org = OrganismData.new(false)
-		org.position = Vector2(
-			randf_range(50, spawn_area.x - 50),
-			randf_range(50, spawn_area.y - 50)
-		)
+		org.position = rand_position_organism()
 		org.energy = 100.0
 		org.is_alive = true
+		org.id = organisms.size()
 		organisms.append(org)
 		spatial_hash.insert(org)
+	
+	print("Spawned ", organisms.size(), " organisms")
+
+func rand_position_organism():
+		var spawn_area = world_bounds.size
+		var rand_pos_x = randf_range(50, spawn_area.x - 50)
+		var rand_pos_y = randf_range(50, spawn_area.y - 50)
+		print("organism spawned at Vector2(" + str(rand_pos_x) + str(rand_pos_y) + ")")
+		return Vector2(rand_pos_x, rand_pos_y)
+
 
 func update_population(delta: float, environment: Dictionary):
 	# Batch updates for performance
@@ -71,10 +87,29 @@ func update_population(delta: float, environment: Dictionary):
 		
 		# Movement (simple random walk)
 		var move_speed = org.mobility * 0.5
-		org.position += Vector2(
+		var movement = Vector2(
 			randf_range(-move_speed, move_speed),
 			randf_range(-move_speed, move_speed)
 		) * delta
+		
+		org.position += movement
+		
+		movement_tracker.total_x += movement.x
+		movement_tracker.total_y += movement.y
+		movement_tracker.count += 1
+		movement_tracker.frame += 1
+
+		if movement_tracker.frame % 300 == 0:  # Every ~5 seconds at 60fps
+			var avg_x = movement_tracker.total_x / movement_tracker.count
+			var avg_y = movement_tracker.total_y / movement_tracker.count
+			#print("Movement averages over %d movements: x=%.4f, y=%.4f" % [movement_tracker.count, avg_x, avg_y])
+			movement_tracker.total_x = 0.0
+			movement_tracker.total_y = 0.0
+			movement_tracker.count = 0
+				
+		# Wrap around boundaries instead of going off-screen
+		wrap_position(org)
+		
 		spatial_hash.update(org)
 		
 		# Reproduction
@@ -86,6 +121,18 @@ func update_population(delta: float, environment: Dictionary):
 	
 	# Enforce carrying capacity
 	enforce_carrying_capacity(environment)
+
+func wrap_position(org: OrganismData):
+	# Wrap around screen boundaries
+	if org.position.x < 0:
+		org.position.x = world_bounds.size.x
+	elif org.position.x > world_bounds.size.x:
+		org.position.x = 0
+	
+	if org.position.y < 0:
+		org.position.y = world_bounds.size.y
+	elif org.position.y > world_bounds.size.y:
+		org.position.y = 0
 
 func attempt_reproduction(org: OrganismData):
 	if org.is_sexual:
@@ -100,7 +147,6 @@ func attempt_reproduction(org: OrganismData):
 				# Found mate!
 				var offspring = org.recombine_with(other)
 				spawn_offspring(offspring, org.position)
-				
 				org.seeking_mate = false
 				other.seeking_mate = false
 				org.reproduction_cooldown = randf_range(15.0, 25.0)
@@ -123,6 +169,11 @@ func spawn_offspring(offspring: OrganismData, near_position: Vector2):
 		randf_range(-10, 10),
 		randf_range(-10, 10)
 	)
+	
+	# Wrap offspring position instead of clamping to prevent edge accumulation
+	wrap_position(offspring)
+	print("organism spawned at " + str(offspring.position))
+	
 	offspring.energy = 50.0
 	offspring.is_alive = true
 	offspring.id = organisms.size()  # Simple ID assignment
@@ -215,6 +266,10 @@ func get_population_stats() -> Dictionary:
 			stats.avg_traits[a_trait] = trait_sums[a_trait] / total
 	
 	return stats
+
+func apply_settings(settings: Dictionary):
+	# Apply any population-specific settings from scenarios
+	pass
 
 func reset():
 	for org in organisms:

@@ -9,6 +9,7 @@ var asexual_multimesh: MultiMeshInstance2D
 var sexual_color = Color(0.2, 0.5, 1.0)  # Blue
 var asexual_color = Color(1.0, 0.3, 0.3)  # Red
 
+
 func _ready():
 	setup_multimeshes()
 
@@ -77,16 +78,27 @@ func update_visuals(population_manager: PopulationManager):
 	var sexual_transforms: Array[Transform2D] = []
 	var asexual_transforms: Array[Transform2D] = []
 	
+	# In visual_manager.gd, in update_visuals(), replace the entire organism loop:
+
 	for org in population_manager.organisms:
 		if not org.is_alive:
 			continue
 		
-		var transform = Transform2D()
-		transform.origin = org.position
-		
+		# Create fresh transform for each organism
+		var scale_factor = remap(org.energy, 0, 100, 0.5, 1.5)
+		var transform = Transform2D(
+			Vector2(scale_factor, 0),      # X basis vector (scaled)
+			Vector2(0, scale_factor),      # Y basis vector (scaled)
+			org.position                    # Origin (stays at organism position)
+		)		
 		# Scale based on energy
-		var scale = remap(org.energy, 0, 100, 0.5, 1.5)
-		transform = transform.scaled(Vector2(scale, scale))
+		
+		# Debug first organism only
+#		if org.id == 0 and Engine.get_process_frames() % 60 == 0:
+#			print("Org 0 - Pos: ", org.position, " Origin before: ", transform.origin)
+				
+#		if org.id == 0 and Engine.get_process_frames() % 60 == 0:
+#			print("After scale - Origin: ", transform.origin, " Scale: ", scale_factor)
 		
 		if org.is_sexual:
 			sexual_transforms.append(transform)
@@ -98,6 +110,8 @@ func update_visuals(population_manager: PopulationManager):
 	# Update multimeshes
 	update_multimesh(sexual_multimesh, sexual_transforms, sexual_count)
 	update_multimesh(asexual_multimesh, asexual_transforms, asexual_count)
+
+
 
 func update_multimesh(multimesh_instance: MultiMeshInstance2D, transforms: Array[Transform2D], count: int):
 	# Expand if needed

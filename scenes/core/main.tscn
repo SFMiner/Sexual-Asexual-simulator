@@ -6,22 +6,62 @@
 [ext_resource type="Script" uid="uid://ccponkyvrm4pp" path="res://scripts/managers/visual_manager.gd" id="4"]
 [ext_resource type="PackedScene" uid="uid://7u7l6evisnec" path="res://scenes/ui/hud.tscn" id="5"]
 
-[sub_resource type="GDScript" id="init_script"]
-script/source = "extends Node
+[sub_resource type="GDScript" id="main_controller"]
+script/source = "extends Control
+
+# Main scene controller - handles initialization and viewport sizing
+
+@onready var sub_viewport = $SimulationView/SubViewport
+@onready var sim_manager = get_node(\"/root/SimulationManager\")
 
 func _ready():
-	var sim_manager = get_node('/root/SimulationManager')
-	var main = get_parent()
+	# Initialize managers
+	sim_manager.population_manager = $Managers/PopulationManager
+	sim_manager.environment_manager = $Managers/EnvironmentManager
+	sim_manager.statistics_collector = $Managers/StatisticsCollector
+	sim_manager.visual_manager = $SimulationView/SubViewport/SimulationSpace/VisualManager
 	
-	sim_manager.population_manager = main.get_node('Managers/PopulationManager')
-	sim_manager.environment_manager = main.get_node('Managers/EnvironmentManager')
-	sim_manager.statistics_collector = main.get_node('Managers/StatisticsCollector')
-	sim_manager.visual_manager = main.get_node('SimulationView/SubViewport/SimulationSpace/VisualManager')
-	
-	var hud = main.get_node('HUD')
+	# Setup HUD
+	var hud = $HUD
 	hud.sim_manager = sim_manager
 	
+	# Defer viewport sizing until after layout is ready
+	call_deferred(\"_initialize_viewport\")
+
+func _initialize_viewport():
+	# Set initial viewport size to match window
+	_update_viewport_size()
+	
+	# Connect to window resize
+	get_viewport().size_changed.connect(_on_window_resized)
+	
+	# Start simulation
 	sim_manager.reset_simulation()
+
+func _on_window_resized():
+	_update_viewport_size()
+	
+	# Update population manager bounds
+	if sim_manager and sim_manager.population_manager:
+		sim_manager.population_manager.world_bounds = Rect2(Vector2.ZERO, sub_viewport.size)
+
+func _update_viewport_size():
+	if sub_viewport:
+		# Get the actual window size
+		var window_size = get_viewport().get_visible_rect().size
+		sub_viewport.size = Vector2i(int(window_size.x), int(window_size.y))
+		
+		print(\"SubViewport resized to: \", sub_viewport.size)
+
+func _process(_delta):
+	# Continuously sync viewport size (fallback in case resize signal doesn't fire)
+	if sub_viewport:
+		var window_size = get_viewport().get_visible_rect().size
+		var target_size = Vector2i(int(window_size.x), int(window_size.y))
+		if sub_viewport.size != target_size:
+			sub_viewport.size = target_size
+			if sim_manager and sim_manager.population_manager:
+				sim_manager.population_manager.world_bounds = Rect2(Vector2.ZERO, window_size)
 "
 
 [node name="Main" type="Control"]
@@ -31,6 +71,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = SubResource("main_controller")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -72,6 +113,3 @@ script = ExtResource("2")
 script = ExtResource("3")
 
 [node name="HUD" parent="." instance=ExtResource("5")]
-
-[node name="InitScript" type="Node" parent="."]
-script = SubResource("init_script")
