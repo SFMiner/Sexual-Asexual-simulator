@@ -32,9 +32,15 @@ func spawn_initial_population(sexual_count: int, asexual_count: int):
 	
 	var spawn_area = world_bounds.size
 	
+	# Get current environment to spawn adapted organisms
+	var sim_manager = get_node("/root/SimulationManager")
+	var current_env = sim_manager.environment_manager.get_conditions()
+	
 	# Spawn sexual organisms
 	for i in sexual_count:
 		var org = OrganismData.new(true)
+		# Initialize with traits adapted to current environment
+		initialize_adapted_organism(org, current_env)
 		org.position = rand_position_organism()
 		org.energy = 100.0
 		org.is_alive = true
@@ -45,6 +51,8 @@ func spawn_initial_population(sexual_count: int, asexual_count: int):
 	# Spawn asexual organisms
 	for i in asexual_count:
 		var org = OrganismData.new(false)
+		# Initialize with traits adapted to current environment
+		initialize_adapted_organism(org, current_env)
 		org.position = rand_position_organism()
 		org.energy = 100.0
 		org.is_alive = true
@@ -53,6 +61,20 @@ func spawn_initial_population(sexual_count: int, asexual_count: int):
 		spatial_hash.insert(org)
 	
 	print("Spawned ", organisms.size(), " organisms")
+
+func initialize_adapted_organism(org: OrganismData, environment: Dictionary):
+	# Start with random traits
+	Genetics.initialize_random_traits(org)
+	
+	# Bias temperature tolerance toward current temperature
+	var current_temp = environment.temperature
+	org.temperature_tolerance = randf_range(current_temp - 15.0, current_temp + 15.0)
+	org.temperature_tolerance = clamp(org.temperature_tolerance, 0.0, 100.0)
+	
+	# Give decent starting values for other important traits
+	org.pathogen_resistance = randf_range(40.0, 70.0)
+	org.resource_efficiency = randf_range(40.0, 70.0)
+	org.mobility = randf_range(40.0, 70.0)
 
 func rand_position_organism():
 		var spawn_area = world_bounds.size
@@ -75,13 +97,20 @@ func update_population(delta: float, environment: Dictionary):
 		if not org.is_alive:
 			continue
 		
+
 		# Age and energy
 		org.age += delta
-		org.energy -= delta * 2.0  # Base metabolism
+		org.energy -= delta * 1.0  # Reduced from 2.0 - less harsh metabolism
 		
 		# Fitness check
 		var fitness = org.calculate_fitness(environment)
-		if fitness < 0.3 or org.energy <= 0:
+		
+		# Energy recovery based on fitness and resources (BEFORE death check)
+		var energy_gain = fitness * (environment.resource_abundance / 100.0) * delta * 3.0
+		org.energy = min(org.energy + energy_gain, 100.0)
+		
+		# Death check - more lenient thresholds
+		if fitness < 0.2 or org.energy <= 0:
 			kill_organism(org, idx)
 			continue
 		

@@ -3,11 +3,40 @@ extends Node2D
 
 # Handles all organism rendering using MultiMeshInstance2D
 
+signal organism_clicked(organism: OrganismData)
+
 var sexual_multimesh: MultiMeshInstance2D
 var asexual_multimesh: MultiMeshInstance2D
 
 var sexual_color = Color(0.2, 0.5, 1.0)  # Blue
 var asexual_color = Color(1.0, 0.3, 0.3)  # Red
+
+var current_population_manager: PopulationManager  # Store reference for click detection
+
+var population_manager: PopulationManager
+
+func _input(event):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if not population_manager:
+			return
+			
+		var click_pos = get_local_mouse_position()
+		var closest_org = null
+		var min_dist_sq = 100.0 # Max click distance (squared)
+
+		for org in population_manager.organisms:
+			if not org.is_alive:
+				continue
+
+			var dist_sq = org.position.distance_squared_to(click_pos)
+			var radius = 3.0 * remap(org.energy, 0, 100, 0.5, 1.5) # Base radius * scale
+			
+			if dist_sq < radius * radius and dist_sq < min_dist_sq:
+				closest_org = org
+				min_dist_sq = dist_sq
+		
+		if closest_org:
+			organism_clicked.emit(closest_org)
 
 
 func _ready():
@@ -70,7 +99,8 @@ func create_circle_mesh(radius: float, color: Color) -> ArrayMesh:
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	return mesh
 
-func update_visuals(population_manager: PopulationManager):
+func update_visuals(p_manager: PopulationManager):
+	self.population_manager = p_manager
 	var sexual_count = 0
 	var asexual_count = 0
 	
@@ -91,14 +121,6 @@ func update_visuals(population_manager: PopulationManager):
 			Vector2(0, scale_factor),      # Y basis vector (scaled)
 			org.position                    # Origin (stays at organism position)
 		)		
-		# Scale based on energy
-		
-		# Debug first organism only
-#		if org.id == 0 and Engine.get_process_frames() % 60 == 0:
-#			print("Org 0 - Pos: ", org.position, " Origin before: ", transform.origin)
-				
-#		if org.id == 0 and Engine.get_process_frames() % 60 == 0:
-#			print("After scale - Origin: ", transform.origin, " Scale: ", scale_factor)
 		
 		if org.is_sexual:
 			sexual_transforms.append(transform)

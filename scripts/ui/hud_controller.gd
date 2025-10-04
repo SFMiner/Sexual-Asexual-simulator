@@ -8,6 +8,7 @@ extends CanvasLayer
 
 @onready var graph_renderer = $RightPanel/MarginContainer/VBoxContainer/GraphRenderer
 @onready var control_panel = $RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel
+@onready var organism_inspector = $RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent
 
 @onready var play_button = $TopPanel/MarginContainer/HBoxContainer/Controls/PlayButton
 @onready var pause_button = $TopPanel/MarginContainer/HBoxContainer/Controls/PauseButton
@@ -15,7 +16,17 @@ extends CanvasLayer
 @onready var speed_slider = $TopPanel/MarginContainer/HBoxContainer/Controls/SpeedSlider
 @onready var speed_value = $TopPanel/MarginContainer/HBoxContainer/Controls/SpeedValue
 
-var sim_manager: SimulationManager
+@onready var graph_button = $RightPanel/MarginContainer/VBoxContainer/ViewToggle/GraphButton
+@onready var inspector_button = $RightPanel/MarginContainer/VBoxContainer/ViewToggle/InspectorButton
+
+var sim_manager: SimulationManager:
+	set(value):
+		sim_manager = value
+		if is_node_ready():
+			setup_connections()
+
+var selected_organism: OrganismData = null
+var inspector_update_timer: float = 0.0
 
 func _ready():
 	if sim_manager:
@@ -26,6 +37,14 @@ func setup_connections():
 	sim_manager.simulation_state_changed.connect(_on_state_changed)
 	
 	control_panel.connect_to_environment(sim_manager.environment_manager)
+
+func show_graph_view():
+	graph_renderer.show()
+	organism_inspector.get_parent().hide()
+
+func show_organism_details(organism):
+	if organism_inspector:
+		organism_inspector.show_organism(organism)
 
 func _on_play_pressed():
 	sim_manager.start_simulation()
@@ -64,8 +83,17 @@ func _on_export_pressed():
 		sim_manager.population_manager,
 		sim_manager.environment_manager,
 		sim_manager.statistics_collector,
-		"simulation_data"
+		"simulation_data" 
 	)
 	
 	print("All data exported successfully!")
 	print("Files saved to: " + ProjectSettings.globalize_path("user://"))
+
+func _on_inspector_closed():
+	# Clear selected organism
+	selected_organism = null
+	
+	# Switch back to graph view
+	graph_button.button_pressed = true
+	inspector_button.button_pressed = false
+	show_graph_view()

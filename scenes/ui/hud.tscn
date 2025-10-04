@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://7u7l6evisnec"]
+[gd_scene load_steps=5 format=3 uid="uid://7u7l6evisnec"]
 
 [ext_resource type="Script" uid="uid://vooqryllo1p4" path="res://scripts/ui/hud_controller.gd" id="1"]
 [ext_resource type="Script" uid="uid://dalg30jfifpht" path="res://scripts/ui/graph_renderer.gd" id="2"]
 [ext_resource type="Script" uid="uid://dqf2n0tynjh4n" path="res://scripts/ui/control_panel.gd" id="3"]
+[ext_resource type="Script" uid="uid://djtdbkx847c4t" path="res://scripts/utils/organism_inspector.gd" id="4_8qguk"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1")
@@ -242,6 +243,60 @@ layout_mode = 2
 layout_mode = 2
 text = "Export Statistics to CSV"
 
+[node name="OrganismInspector" type="ScrollContainer" parent="RightPanel/MarginContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InspectorContent" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+script = ExtResource("4_8qguk")
+
+[node name="TitleLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "No Organism Selected"
+horizontal_alignment = 1
+
+[node name="TypeLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+text = "Click an organism to inspect"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+
+[node name="StatsLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+text = "Statistics"
+horizontal_alignment = 1
+
+[node name="StatsContainer" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="HSeparator2" type="HSeparator" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+
+[node name="TraitsLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+text = "Genetic Traits"
+horizontal_alignment = 1
+
+[node name="TraitsContainer" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HSeparator3" type="HSeparator" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent"]
+layout_mode = 2
+text = "Close Inspector"
+
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/PlayButton" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/PauseButton" to="." method="_on_pause_pressed"]
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/ResetButton" to="." method="_on_reset_pressed"]
@@ -252,3 +307,4 @@ text = "Export Statistics to CSV"
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/PathogenFreq/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_pathogen_freq_changed"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ResourceLevel/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_resource_changed"]
 [connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ExportButton" to="." method="_on_export_pressed"]
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent/CloseButton" to="." method="_on_inspector_closed"]
