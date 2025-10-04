@@ -18,6 +18,8 @@ extends CanvasLayer
 @onready var reset_button = $TopPanel/MarginContainer/HBoxContainer/Controls/ResetButton
 @onready var speed_slider = $TopPanel/MarginContainer/HBoxContainer/Controls/SpeedSlider
 @onready var speed_value = $TopPanel/MarginContainer/HBoxContainer/Controls/SpeedValue
+@onready var zoom_value = $TopPanel/MarginContainer/HBoxContainer/Controls/ZoomValue
+@onready var reset_zoom_button = $TopPanel/MarginContainer/HBoxContainer/Controls/ResetZoomButton
 
 
 var sim_manager: SimulationManager:
@@ -38,14 +40,54 @@ func setup_connections():
 	sim_manager.simulation_state_changed.connect(_on_state_changed)
 	
 	control_panel.connect_to_environment(sim_manager.environment_manager)
+	
+	# Connect button signals
+	graph_button.pressed.connect(_on_graph_button_pressed)
+	inspector_button.pressed.connect(_on_inspector_button_pressed)
+	organism_inspector.get_node("CloseButton").pressed.connect(_on_inspector_closed)
+
+func _process(delta):
+	# Update inspector in real-time if visible and organism selected
+	if selected_organism and organism_inspector_scroll.visible:
+		inspector_update_timer += delta
+		if inspector_update_timer >= 0.1:  # Update 10 times per second
+			inspector_update_timer = 0.0
+			if selected_organism.is_alive:
+				organism_inspector.show_organism(selected_organism)
+			else:
+				# Organism died, clear selection
+				selected_organism = null
+				_on_inspector_closed()
+
+func _on_graph_button_pressed():
+	if graph_button.button_pressed:
+		inspector_button.button_pressed = false
+		show_graph_view()
+
+func _on_inspector_button_pressed():
+	if inspector_button.button_pressed:
+		graph_button.button_pressed = false
+		show_inspector_view()
 
 func show_graph_view():
 	graph_renderer.show()
-	organism_inspector.get_parent().hide()
+	organism_inspector_scroll.hide()
 
-func show_organism_details(organism):
-	if organism_inspector:
-		organism_inspector.show_organism(organism)
+func show_inspector_view():
+	graph_renderer.hide()
+	organism_inspector_scroll.show()
+
+func show_organism_details(organism: OrganismData):
+	print("HUD: Showing organism #", organism.id)
+	selected_organism = organism
+	
+	# Switch to inspector view
+	inspector_button.button_pressed = true
+	graph_button.button_pressed = false
+	show_inspector_view()
+	
+	# Show the organism in the inspector
+	organism_inspector.show_organism(organism)
 
 func _on_play_pressed():
 	sim_manager.start_simulation()
@@ -91,6 +133,7 @@ func _on_export_pressed():
 	print("Files saved to: " + ProjectSettings.globalize_path("user://"))
 
 func _on_inspector_closed():
+	print("HUD: Inspector closed")
 	# Clear selected organism
 	selected_organism = null
 	
@@ -98,3 +141,8 @@ func _on_inspector_closed():
 	graph_button.button_pressed = true
 	inspector_button.button_pressed = false
 	show_graph_view()
+	
+	# Clear visual manager selection too
+	if sim_manager and sim_manager.visual_manager:
+		sim_manager.visual_manager.selected_organism = null
+		sim_manager.visual_manager.queue_redraw()

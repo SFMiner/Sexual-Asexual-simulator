@@ -79,6 +79,21 @@ value = 1.0
 layout_mode = 2
 text = "1.0x"
 
+[node name="VSeparator" type="VSeparator" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+
+[node name="ZoomLabel" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+text = "Zoom:"
+
+[node name="ZoomValue" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+text = "1.0x"
+
+[node name="ResetZoomButton" type="Button" parent="TopPanel/MarginContainer/HBoxContainer/Controls"]
+layout_mode = 2
+text = "Reset View"
+
 [node name="RightPanel" type="PanelContainer" parent="."]
 anchors_preset = 11
 anchor_left = 1.0
@@ -317,16 +332,14 @@ text = "Close Inspector"
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/PlayButton" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/PauseButton" to="." method="_on_pause_pressed"]
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/ResetButton" to="." method="_on_reset_pressed"]
-[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ExportButton" to="." method="_on_export_pressed"]
-[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent/CloseButton" to="." method="_on_inspector_closed"]
 [connection signal="value_changed" from="TopPanel/MarginContainer/HBoxContainer/Controls/SpeedSlider" to="." method="_on_speed_changed"]
+[connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/ResetZoomButton" to="." method="_on_reset_zoom_pressed"]
 [connection signal="item_selected" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ScenarioSelector/OptionButton" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_scenario_selected"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempAmplitude/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_temp_amplitude_changed"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempFrequency/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_temp_frequency_changed"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/PathogenFreq/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_pathogen_freq_changed"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ResourceLevel/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_resource_changed"]
-
-
-
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ExportButton" to="." method="_on_export_pressed"]
 [connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/ViewToggle/GraphButton" to="." method="_on_graph_button_pressed"]
 [connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/ViewToggle/InspectorButton" to="." method="_on_inspector_button_pressed"]
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent/CloseButton" to="." method="_on_inspector_closed"]
