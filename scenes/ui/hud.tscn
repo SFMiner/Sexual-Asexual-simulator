@@ -113,11 +113,6 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="GraphLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Population Over Time"
-horizontal_alignment = 1
-
 [node name="GraphRenderer" type="Control" parent="RightPanel/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
@@ -243,6 +238,28 @@ layout_mode = 2
 layout_mode = 2
 text = "Export Statistics to CSV"
 
+[node name="ViewToggle" type="HBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="GraphButton" type="Button" parent="RightPanel/MarginContainer/VBoxContainer/ViewToggle"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_pressed = true
+text = "Graph"
+
+[node name="InspectorButton" type="Button" parent="RightPanel/MarginContainer/VBoxContainer/ViewToggle"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Inspector"
+
+[node name="GraphLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Population Over Time"
+horizontal_alignment = 1
+
 [node name="OrganismInspector" type="ScrollContainer" parent="RightPanel/MarginContainer/VBoxContainer"]
 visible = false
 custom_minimum_size = Vector2(0, 300)
@@ -300,11 +317,16 @@ text = "Close Inspector"
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/PlayButton" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/PauseButton" to="." method="_on_pause_pressed"]
 [connection signal="pressed" from="TopPanel/MarginContainer/HBoxContainer/Controls/ResetButton" to="." method="_on_reset_pressed"]
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ExportButton" to="." method="_on_export_pressed"]
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent/CloseButton" to="." method="_on_inspector_closed"]
 [connection signal="value_changed" from="TopPanel/MarginContainer/HBoxContainer/Controls/SpeedSlider" to="." method="_on_speed_changed"]
 [connection signal="item_selected" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ScenarioSelector/OptionButton" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_scenario_selected"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempAmplitude/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_temp_amplitude_changed"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/TempFrequency/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_temp_frequency_changed"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/PathogenFreq/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_pathogen_freq_changed"]
 [connection signal="value_changed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ResourceLevel/Slider" to="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel" method="_on_resource_changed"]
-[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/ExportButton" to="." method="_on_export_pressed"]
-[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent/CloseButton" to="." method="_on_inspector_closed"]
+
+
+
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/ViewToggle/GraphButton" to="." method="_on_graph_button_pressed"]
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/ViewToggle/InspectorButton" to="." method="_on_inspector_button_pressed"]

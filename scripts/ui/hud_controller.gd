@@ -7,8 +7,11 @@ extends CanvasLayer
 @onready var generation_label = $TopPanel/MarginContainer/HBoxContainer/Stats/Generation
 
 @onready var graph_renderer = $RightPanel/MarginContainer/VBoxContainer/GraphRenderer
-@onready var control_panel = $RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel
+@onready var organism_inspector_scroll = $RightPanel/MarginContainer/VBoxContainer/OrganismInspector
 @onready var organism_inspector = $RightPanel/MarginContainer/VBoxContainer/OrganismInspector/InspectorContent
+@onready var graph_button = $RightPanel/MarginContainer/VBoxContainer/ViewToggle/GraphButton
+@onready var inspector_button = $RightPanel/MarginContainer/VBoxContainer/ViewToggle/InspectorButton
+@onready var control_panel = $RightPanel/MarginContainer/VBoxContainer/HBoxContainer/ControlPanel
 
 @onready var play_button = $TopPanel/MarginContainer/HBoxContainer/Controls/PlayButton
 @onready var pause_button = $TopPanel/MarginContainer/HBoxContainer/Controls/PauseButton
@@ -16,8 +19,6 @@ extends CanvasLayer
 @onready var speed_slider = $TopPanel/MarginContainer/HBoxContainer/Controls/SpeedSlider
 @onready var speed_value = $TopPanel/MarginContainer/HBoxContainer/Controls/SpeedValue
 
-@onready var graph_button = $RightPanel/MarginContainer/VBoxContainer/ViewToggle/GraphButton
-@onready var inspector_button = $RightPanel/MarginContainer/VBoxContainer/ViewToggle/InspectorButton
 
 var sim_manager: SimulationManager:
 	set(value):

@@ -15,28 +15,36 @@ var current_population_manager: PopulationManager  # Store reference for click d
 
 var population_manager: PopulationManager
 
+var selected_organism: OrganismData = null  # Track selected organism for highlighting
+
 func _input(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if not population_manager:
 			return
 			
 		var click_pos = get_local_mouse_position()
+		print("Visual Manager: Click at ", click_pos)
+		
 		var closest_org = null
-		var min_dist_sq = 100.0 # Max click distance (squared)
+		var min_dist = 15.0  # Max click distance
 
 		for org in population_manager.organisms:
 			if not org.is_alive:
 				continue
 
-			var dist_sq = org.position.distance_squared_to(click_pos)
-			var radius = 3.0 * remap(org.energy, 0, 100, 0.5, 1.5) # Base radius * scale
+			var dist = org.position.distance_to(click_pos)
 			
-			if dist_sq < radius * radius and dist_sq < min_dist_sq:
+			if dist < min_dist:
 				closest_org = org
-				min_dist_sq = dist_sq
+				min_dist = dist
 		
 		if closest_org:
+			print("Visual Manager: Found organism #", closest_org.id)
+			selected_organism = closest_org
 			organism_clicked.emit(closest_org)
+			queue_redraw()
+		else:
+			print("Visual Manager: No organism found near click")
 
 
 func _ready():
